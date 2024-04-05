@@ -1,6 +1,8 @@
 from flask import render_template, jsonify, request
 from app import app, db
 from app.models import User
+from app.models import Folder
+from app.models import Email
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
