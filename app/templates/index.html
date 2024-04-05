@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Classification System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="template-box" onclick="navigateTo('/mail_filtering')">Mail Filtering</div>
+        <div class="template-box" onclick="navigateTo('/mail_screening')">Mail Screening</div>
+        <div class="template-box" onclick="navigateTo('/mail_marking')">Mail Marking</div>
+        <div class="template-box" onclick="navigateTo('/mail_archiving')">Mail Archiving</div>
+        <div class="template-box" onclick="navigateTo('/user_management')">User Management</div>
+    </header>
+
+    <!-- Glass pane for text description -->
+    <div class="glass-pane">
+        <div class="text-area">
+            <h1>Welcome to the Spam Classification System</h1>
+            <p>
+                This system provides various functionalities such as mail filtering, screening, marking, archiving, and user management.
+                You can navigate through the different features using the header menu above.
+            </p>
+        </div>
+    </div>
+
+    <!-- JavaScript to handle navigation -->
+    <script>
+        function navigateTo(url) {
+            window.location.href = url;
+        }
+    </script>
+</body>
+</html>

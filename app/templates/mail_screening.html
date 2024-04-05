@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mail Screening</title>
+    <style>
+        body {
+            background-image: url('../static/SCstfhBx.jpeg'); /* Set background image */
+            background-size: cover;
+            margin: 0; /* Remove default margin */
+            font-family: 'Roboto', sans-serif; /* Set font style */
+            text-align: center; /* Center align text */
+        }
+
+        h1 {
+            color: #333; /* Text color */
+            margin-top: 50px; /* Add space from top */
+        }
+
+        form {
+            margin-top: 20px; /* Add space from top */
+        }
+
+        label {
+            color: #555; /* Label text color */
+            display: block; /* Display block for label */
+            margin-bottom: 10px; /* Add space after label */
+        }
+
+        input[type="email"] {
+            padding: 8px; /* Add padding to input */
+            border: 1px solid #ccc; /* Add border */
+            border-radius: 5px; /* Add border radius */
+            width: 300px; /* Set input width */
+            margin-bottom: 20px; /* Add space after input */
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px; /* Add padding to button */
+            background-color: #007bff; /* Button background color */
+            color: #fff; /* Button text color */
+            border: none; /* Remove button border */
+            border-radius: 5px; /* Add border radius */
+            cursor: pointer; /* Set cursor to pointer */
+            transition: background-color 0.3s; /* Smooth transition for background color */
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3; /* Darker background color on hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>Mail Screening</h1>
+    <form id="screeningForm">
+        <label for="blacklist">Blacklist Email Address:</label>
+        <input type="email" id="blacklist" name="blacklist">
+        <button type="submit">Add to Blacklist</button>
+    </form>
+
+    <script>
+        document.getElementById('screeningForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var email = document.getElementById('blacklist').value;
+            // AJAX request to backend service to add email to blacklist
+            fetch('/api/screening/add', {  // Adjust the endpoint URL
+                method: 'POST',
+                body: JSON.stringify({ entry: email }),  // Corrected the JSON key
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                // Handle response
+                if (response.ok) {
+                    // Optionally, show a success message or perform any other action
+                    console.log('Email added to blacklist successfully.');
+                } else {
+                    console.error('Failed to add email to blacklist:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

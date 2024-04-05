@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <style>
+        body {
+            background-image: url('../static/_vUi0Hvr.jpeg'); /* Set background image */
+            background-size: cover;
+            margin: 0; /* Remove default margin */
+            font-family: 'Roboto', sans-serif; /* Set font style */
+            text-align: center; /* Center align text */
+            color: black; /* Text color */
+        }
+
+        h1, h2 {
+            margin-top: 50px; /* Add space from top */
+        }
+
+        form {
+            margin-top: 20px; /* Add space from top */
+            display: flex; /* Use flexbox */
+            flex-direction: column; /* Align form items vertically */
+            align-items: center; /* Center align form items */
+        }
+
+        label {
+            color: black; /* Label text color */
+            display: block; /* Display block for label */
+            margin-bottom: 10px; /* Add space after label */
+        }
+
+        input[type="text"],
+        input[type="email"],
+        button[type="submit"] {
+            padding: 8px; /* Add padding to input and button */
+            margin-bottom: 20px; /* Add space after input and button */
+            width: 300px; /* Set input and button width */
+            border-radius: 5px; /* Add border radius */
+            border: 1px solid #ccc; /* Add border */
+        }
+
+        button[type="submit"] {
+            background-color: #007bff; /* Button background color */
+            color: #fff; /* Button text color */
+            border: none; /* Remove button border */
+            cursor: pointer; /* Set cursor to pointer */
+            transition: background-color 0.3s; /* Smooth transition for background color */
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3; /* Darker background color on hover */
+        }
+
+        ul {
+            list-style-type: none; /* Remove default list style */
+            padding: 0; /* Remove default padding */
+        }
+
+        li {
+            margin-bottom: 10px; /* Add space between list items */
+        }
+    </style>
+</head>
+<body>
+    <h1>User Management</h1>
+
+    <!-- Form for adding a new user -->
+    <h2>Add New User</h2>
+    <form id="addUserForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+        <button type="submit">Add User</button>
+    </form>
+
+    <!-- User list -->
+    <h2>User List</h2>
+    <ul id="userList">
+        <!-- User list items will be dynamically added here -->
+    </ul>
+
+    <script>
+        // Function to fetch user list and update the UI
+        function fetchUserList() {
+            fetch('/api/users')
+            .then(response => response.json())
+            .then(data => {
+                const userList = document.getElementById('userList');
+                userList.innerHTML = ''; // Clear previous user list
+
+                data.forEach(user => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${user.username} - ${user.email}`;
+                    userList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Event listener for adding a new user
+        document.getElementById('addUserForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+
+            fetch('/api/user/add', {
+                method: 'POST',
+                body: JSON.stringify({ username: username, email: email }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    fetchUserList(); // Refresh user list after adding user
+                    // Clear input fields
+                    document.getElementById('username').value = '';
+                    document.getElementById('email').value = '';
+                } else {
+                    console.error('Error:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        // Fetch user list when the page loads
+        fetchUserList();
+    </script>
+</body>
+</html>

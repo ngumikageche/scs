@@ -1,0 +1,62 @@
+/* Set background image */
+body {
+    background-image: url('xpMSSY-J.jpeg');
+    background-size: cover;
+    margin: 0; /* Remove default margin */
+}
+
+/* Header styles */
+.header {
+    background-color: black; /* Header background color */
+    color: #fff; /* Text color */
+    padding: 10px; /* Padding */
+    display: flex; /* Use flexbox */
+    justify-content: space-between; /* Arrange items equally with space between */
+    font-family: "Roboto Light";
+}
+
+/* Individual template box */
+.template-box {
+    padding: 10px; /* Padding */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Show pointer on hover */
+    transition: background-color 0.3s; /* Smooth transition for background color */
+}
+
+/* Change background color on hover */
+.template-box:hover {
+    background-color: pink; /* Darker background color */
+}
+
+/* Glass pane design for text description */
+.glass-pane {
+    display: grid;
+    place-items: center; /* Center the text vertically and horizontally */
+    position: absolute; /* Position absolutely */
+    top: 320px; /* Align the pane to the top */
+    left: 0; /* Align the pane to the left */
+    width: 100vw; /* Full viewport width */
+    height: auto; /* Adjust height based on content */
+    padding: 20px; /* Add padding for spacing around content */
+    background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white background */
+    backdrop-filter: blur(3px); /* Apply blur effect to the background */
+    z-index: 1; /* Ensure the glass pane is above other elements */
+}
+
+/* Text area inside the glass pane */
+.text-area {
+    width: 80%; /* Adjust the width of the text area */
+    max-width: 800px; /* Limit the maximum width */
+    padding: 20px; /* Add padding to the container */
+    border-radius: 10px; /* Add rounded corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow */
+    background-color: transparent; /* Transparent background */
+    font-family: "Roboto Light"; /* Set font family */
+    text-align: justify;
+}
+
+/* Add more styles as needed */
+body-mail-archiving {
+    background-image: url('c2_wK2A1.jpeg'); /* Replace 'mail-archiving-background.jpg' with the path to your image */
+    background-size: cover;
+}

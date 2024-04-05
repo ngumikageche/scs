@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mail Archiving</title>
+
+    <style>
+        /* Set background image */
+        body {
+            background-image: url('../static/c2_wK2A1.jpeg'); /* Replace 'c2_wK2A1.jpeg' with the path to your image */
+            background-size: cover;
+            margin: 0; /* Remove default margin */
+            font-family: "Roboto", sans-serif; /* Set font family */
+        }
+
+        /* Header styles */
+        .header {
+            background-color: black; /* Header background color */
+            color: #fff; /* Text color */
+            padding: 10px; /* Padding */
+            display: flex; /* Use flexbox */
+            justify-content: center; /* Center items horizontally */
+            font-family: "Roboto", sans-serif; /* Set font family */
+        }
+
+        /* Individual template box */
+        .template-box {
+            padding: 10px; /* Padding */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Show pointer on hover */
+            transition: background-color 0.3s; /* Smooth transition for background color */
+        }
+
+        /* Change background color on hover */
+        .template-box:hover {
+            background-color: pink; /* Darker background color */
+        }
+
+        /* Glass pane design for text description */
+        .glass-pane {
+            display: grid;
+            place-items: center; /* Center the text vertically and horizontally */
+            position: absolute; /* Position absolutely */
+            top: 50%; /* Align the pane to the vertical center */
+            left: 50%; /* Align the pane to the horizontal center */
+            transform: translate(-50%, -50%); /* Center the pane */
+            width: 80%; /* Set width */
+            max-width: 600px; /* Limit maximum width */
+            padding: 20px; /* Add padding for spacing around content */
+            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white background */
+            backdrop-filter: blur(3px); /* Apply blur effect to the background */
+            z-index: 1; /* Ensure the glass pane is above other elements */
+            border-radius: 10px; /* Add rounded corners */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow */
+            text-align: center; /* Center text */
+        }
+
+        /* Text area inside the glass pane */
+        .text-area {
+            padding: 20px; /* Add padding to the container */
+            text-align: justify;
+        }
+
+        /* Form styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        label {
+            margin-bottom: 10px;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="header">Mail Archiving</h1>
+    <div class="glass-pane">
+        <div class="text-area">
+            <p>Welcome to the Mail Archiving page. Archive your emails here.</p>
+            <form id="archivingForm">
+                <label for="archive">Archive Email:</label>
+                <input type="checkbox" id="archive" name="archive">
+                <button type="submit">Archive</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('archivingForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var isArchived = document.getElementById('archive').checked;
+            // AJAX request to backend service to archive email
+            fetch('/api/mail/archive', {  // Adjust the endpoint URL
+                method: 'POST',
+                body: JSON.stringify({ isArchived: isArchived }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                // Handle response
+                if (response.ok) {
+                    // Optionally, show a success message or perform any other action
+                    console.log('Email archived successfully.');
+                } else {
+                    console.error('Failed to archive email:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

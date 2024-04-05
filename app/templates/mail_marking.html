@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mail Marking</title>
+    <style>
+        body {
+            background-image: url('../static/VnuFwJGp.jpeg'); /* Set background image */
+            background-size: cover;
+            margin: 0; /* Remove default margin */
+            font-family: 'Roboto', sans-serif; /* Set font style */
+            text-align: center; /* Center align text */
+        }
+
+        h1 {
+            color: #333; /* Text color */
+            margin-top: 50px; /* Add space from top */
+        }
+
+        form {
+            margin-top: 20px; /* Add space from top */
+        }
+
+        label {
+            color: #555; /* Label text color */
+            display: block; /* Display block for label */
+            margin-bottom: 10px; /* Add space after label */
+        }
+
+        input[type="checkbox"] {
+            margin-bottom: 20px; /* Add space after checkbox */
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px; /* Add padding to button */
+            background-color: #007bff; /* Button background color */
+            color: #fff; /* Button text color */
+            border: none; /* Remove button border */
+            border-radius: 5px; /* Add border radius */
+            cursor: pointer; /* Set cursor to pointer */
+            transition: background-color 0.3s; /* Smooth transition for background color */
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3; /* Darker background color on hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>Mail Marking</h1>
+    <form id="markingForm">
+        <label for="important">Mark as Important:</label>
+        <input type="checkbox" id="important" name="important">
+        <button type="submit">Mark</button>
+    </form>
+
+    <script>
+        document.getElementById('markingForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var isImportant = document.getElementById('important').checked;
+            // AJAX request to backend service to mark email as important
+            fetch('/api/email/mark', {  // Adjust the endpoint URL
+                method: 'POST',
+                body: JSON.stringify({ isImportant: isImportant }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                // Handle response
+                if (response.ok) {
+                    // Optionally, show a success message or perform any other action
+                    console.log('Email marked successfully.');
+                } else {
+                    console.error('Failed to mark email:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
