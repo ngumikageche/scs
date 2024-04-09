@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mail Archiving</title>
 
     <style>
         /* Set background image */
         body {
-            background-image: url('../static/c2_wK2A1.jpeg'); /* Replace 'c2_wK2A1.jpeg' with the path to your image */
+            background-image: url('../static/c2_wK2A1.jpeg') !important; /* Replace 'c2_wK2A1.jpeg' with the path to your image */
             background-size: cover;
             margin: 0; /* Remove default margin */
             font-family: "Roboto", sans-serif; /* Set font family */
@@ -44,6 +38,22 @@
             position: absolute; /* Position absolutely */
             top: 50%; /* Align the pane to the vertical center */
             left: 50%; /* Align the pane to the horizontal center */
+            transform: translate(-50%, -50%); /* Center the pane */
+            width: 80%; /* Set width */
+            max-width: 600px; /* Limit maximum width */
+            padding: 20px; /* Add padding for spacing around content */
+            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white background */
+            backdrop-filter: blur(3px); /* Apply blur effect to the background */
+            z-index: 1; /* Ensure the glass pane is above other elements */
+            border-radius: 10px; /* Add rounded corners */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow */
+            text-align: center; /* Center text */
+        }
+        .glass-pan-m {
+            display: grid;
+            place-items: center; /* Center the text vertically and horizontally */
+            position: absolute; /* Position absolutely */
+         /* Align the pane to the horizontal center */
             transform: translate(-50%, -50%); /* Center the pane */
             width: 80%; /* Set width */
             max-width: 600px; /* Limit maximum width */
@@ -92,8 +102,10 @@
             background-color: #0056b3;
         }
     </style>
-</head>
-<body>
+
+    {% extends 'base.html' %}
+    {% block title %}Mail Archiving{% endblock %}
+    {% block content %}
     <h1 class="header">Mail Archiving</h1>
     <div class="glass-pane">
         <div class="text-area">
@@ -105,7 +117,7 @@
             </form>
         </div>
     </div>
-
+{% endblock %}
     <script>
         document.getElementById('archivingForm').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -132,5 +144,3 @@
             });
         });
     </script>
-</body>
-</html>

@@ -98,7 +98,7 @@ labels = [0, 0, 1, 0, 1]
 text_data = [email["subject"] + " " + email["content"] for email in emails]
 pipeline.fit(text_data, labels)
 
-@app.route('/add_email', methods=['GET', 'POST'])
+@app.route('/add_email', methods=['POST'])
 def add_email():
     if request.method == 'POST':
         sender = request.form['sender']
@@ -114,7 +114,9 @@ def add_email():
         db.session.add(new_email)
         db.session.commit()
 
-        return redirect(url_for('index'))  # Redirect to the homepage after adding email
+        flash('Email added successfully!', 'success')  # Flash a success message
+
+        return redirect(url_for('mail_filtering'))  # Redirect to the homepage after adding email
     return render_template('add_email.html')
 
 email_filters = []
@@ -136,7 +138,7 @@ def add_email_filter():
     else:
         return jsonify({'error': 'Method not allowed'}), 405
 
-@app.route('/filter_email', methods=['GET', 'POST'])
+@app.route('/filter_email', methods=['POST'])
 def filter_email():
     if request.method == 'POST':
         email_id = request.form['email_id']
@@ -291,15 +293,21 @@ def get_emails_in_folder(folder_id):
 @app.route('/api/blacklist/add', methods=['POST'])
 def add_to_blacklist():
     data = request.json
-    blacklist_type = data.get('type')
-    value = data.get('value')
-    if blacklist_type and value:
-        new_blacklist_item = Blacklist(type=blacklist_type, value=value)
+    email = data.get('email')  # Assuming the key in the JSON is 'email'
+    
+    if email:
+        # Check if the email is already blacklisted
+        existing_entry = Blacklist.query.filter_by(value=email).first()
+        if existing_entry:
+            return jsonify({'error': 'Email already exists in blacklist'}), 400
+        
+        # If not, add it to the blacklist
+        new_blacklist_item = Blacklist(type='email', value=email)
         db.session.add(new_blacklist_item)
         db.session.commit()
-        return jsonify({'message': 'Added to blacklist successfully'}), 200
+        return jsonify({'message': 'Email added to blacklist successfully'}), 200
     else:
-        return jsonify({'error': 'Missing type or value'}), 400
+        return jsonify({'error': 'Missing email'}), 400
     
 def is_blacklisted(blacklist_type, value):
     blacklisted_items = Blacklist.query.filter_by(type=blacklist_type).all()

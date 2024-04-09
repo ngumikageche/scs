@@ -34,7 +34,7 @@ body {
     place-items: center; /* Center the text vertically and horizontally */
     position: absolute; /* Position absolutely */
     top: 320px; /* Align the pane to the top */
-    left: 0; /* Align the pane to the left */
+    /* left: 0; Align the pane to the left */
     width: 100vw; /* Full viewport width */
     height: auto; /* Adjust height based on content */
     padding: 20px; /* Add padding for spacing around content */

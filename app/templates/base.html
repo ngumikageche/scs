@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="template-box" onclick="navigateTo('/mail_filtering')">Mail Filtering</div>
+        <div class="template-box" onclick="navigateTo('/mail_screening')">Mail Screening</div>
+        <div class="template-box" onclick="navigateTo('/mail_marking')">Mail Marking</div>
+        <div class="template-box" onclick="navigateTo('/mail_archiving')">Mail Archiving</div>
+        <div class="template-box" onclick="navigateTo('/user_management')">User Management</div>
+    </header>
+
+    <!-- Glass pane for text description -->
+    {% block content %}{% endblock %}
+
+    <!-- JavaScript to handle navigation -->
+    <script>
+        function navigateTo(url) {
+            window.location.href = url;
+        }
+    </script>
+</body>
+</html>

@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mail Marking</title>
+
     <style>
         body {
-            background-image: url('../static/VnuFwJGp.jpeg'); /* Set background image */
+            background-image: url('../static/VnuFwJGp.jpeg') !important; /* Set background image */
             background-size: cover;
             margin: 0; /* Remove default margin */
             font-family: 'Roboto', sans-serif; /* Set font style */
@@ -46,14 +41,16 @@
             background-color: #0056b3; /* Darker background color on hover */
         }
     </style>
-</head>
-<body>
+    {% extends 'base.html' %}
+    {% block title %}Mail Marking{% endblock %}
+    {% block content %}
     <h1>Mail Marking</h1>
     <form id="markingForm">
         <label for="important">Mark as Important:</label>
         <input type="checkbox" id="important" name="important">
         <button type="submit">Mark</button>
     </form>
+    {% endblock %}
 
     <script>
         document.getElementById('markingForm').addEventListener('submit', function(event) {
@@ -81,5 +78,3 @@
             });
         });
     </script>
-</body>
-</html>
