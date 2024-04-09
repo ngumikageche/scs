@@ -16,6 +16,7 @@ class Email(db.Model):
     sender = db.Column(db.String(120), nullable=False)
     subject = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
+    classification = db.Column(db.String(20), nullable=True)  # New column for classification status
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True)
     folder = db.relationship('Folder', backref=db.backref('emails', lazy=True))
 
@@ -28,3 +29,11 @@ class Folder(db.Model):
 
     def __repr__(self):
         return f"Folder('{self.name}')"
+    
+class Blacklist(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(50), nullable=False)  # Type of blacklisted item (e.g., email, domain)
+    value = db.Column(db.String(255), nullable=False)  # Value of the blacklisted item (e.g., email address, domain)
+
+    def __repr__(self):
+        return f"Blacklist('{self.type}', '{self.value}')"

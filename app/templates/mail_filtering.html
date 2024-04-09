@@ -14,7 +14,7 @@
         }
 
         h1 {
-            color: #333; /* Text color */
+            color: #ff1060; /* Text color */
             margin-top: 50px; /* Add space from top */
         }
 
@@ -23,7 +23,7 @@
         }
 
         label {
-            color: #555; /* Label text color */
+            color: #1534e4; /* Label text color */
             display: block; /* Display block for label */
             margin-bottom: 10px; /* Add space after label */
         }
@@ -52,19 +52,81 @@
     </style>
 </head>
 <body>
-    <h1>Mail Filtering</h1>
-    <form id="filterForm">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email">
-        <button type="submit">Filter</button>
+    <div class="new">
+        <h1>Add New Mails</h1>
+    <form method="POST" action="/add_email">
+        <div>
+            <label for="sender">Sender:</label><br>
+            <input type="text" id="sender" name="sender" required><br>
+        </div>
+        <div>
+            <label for="subject">Subject:</label><br>
+            <input type="text" id="subject" name="subject" required><br>
+        </div>
+        <div>
+            <label for="content">Content:</label><br>
+            <textarea id="content" name="content" rows="10" cols="50" required></textarea><br>
+        </div>
+        <div>
+            <button type="submit">Submit</button>
+        </div>
     </form>
+    </div>
+    <style>
+        table, th, td {
+            border: 1px solid;
+          }
+    </style>
+    <div class="filter">
+        <h1>Mail Filtering</h1>
+        <form method="POST" action="/classify_email">
+            <div>
+                <label for="email_id">Select Email:</label><br>
+                <select id="email_id" name="email_id" required>
+                    {% for email in emails %}
+                    <option value="{{ email.id }}">{{ email.subject }} - {{ email.sender }}</option>
+                    {% endfor %}
+                </select><br>
+            </div>
+            <div>
+                <label for="classification">Classification:</label><br>
+                <select id="classification" name="classification" required>
+                    <option value="spam">Spam</option>
+                    <option value="legitimate">Legitimate</option>
+                </select><br>
+            </div>
+            <div>
+                <button type="submit">Classify</button>
+            </div>
+        </form>
+    </div>
+    <style>
+        text-white {
+            color: white;
+        }
+    </style>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="toast" role="alert">
+                <div class="toast-header">
+                <strong class="mr-auto" style="color:#c8ff00">Classification Status</strong>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
+                </div>
+                <div class="toast-body" style="color:#c8ff00">
+                {{ message }}
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
 
     <script>
         document.getElementById('filterForm').addEventListener('submit', function(event) {
             event.preventDefault();
             var email = document.getElementById('email').value;
             // AJAX request to backend service for mail filtering
-            fetch('/api/email/filter', {  // Adjust the endpoint URL
+            fetch('/api/email/filter', {
                 method: 'POST',
                 body: JSON.stringify({ email: email }),
                 headers: {

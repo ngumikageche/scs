@@ -64,7 +64,7 @@
             event.preventDefault();
             var email = document.getElementById('blacklist').value;
             // AJAX request to backend service to add email to blacklist
-            fetch('/api/screening/add', {  // Adjust the endpoint URL
+            fetch('/api/blacklist/add', {  // Corrected the endpoint URL
                 method: 'POST',
                 body: JSON.stringify({ entry: email }),  // Corrected the JSON key
                 headers: {

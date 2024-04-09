@@ -1,8 +1,9 @@
-from flask import render_template, jsonify, request
+from flask import render_template, jsonify, request, redirect, url_for, flash
 from app import app, db
 from app.models import User
 from app.models import Folder
 from app.models import Email
+from app.models import Blacklist
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
@@ -22,7 +23,8 @@ def index():
 
 @app.route('/mail_filtering')
 def mail_filtering():
-    return render_template('mail_filtering.html')
+    emails = Email.query.all()
+    return render_template('mail_filtering.html', emails=emails)
 
 @app.route('/mail_screening')
 def mail_screening():
@@ -40,22 +42,35 @@ def mail_archiving():
 def user_management():
     return render_template('user_management.html')
 
+@app.route('/emails')
+def show_emails():
+    emails = Email.query.all()  # Retrieve all emails from the database
+    return render_template('emails.html', emails=emails)
+
+@app.route('/blacklist')
+def view_blacklist():
+    blacklisted_items = Blacklist.query.all()
+    return render_template('blacklist.html', blacklisted_items=blacklisted_items)
+
 # Backend API endpoints
 @app.route('/api/user/add', methods=['POST'])
 def add_user():
-    data = request.json
-    username = data.get('username')
-    email = data.get('email')
-    if username and email:
-        existing_user = User.query.filter_by(email=email).first()
-        if existing_user:
-            return jsonify({'error': 'User with this email already exists'}), 400
-        new_user = User(username=username, email=email)
-        db.session.add(new_user)
-        db.session.commit()
-        return jsonify({'message': 'User added successfully'}), 201
-    else:
-        return jsonify({'error': 'Missing username or email'}), 400
+    try:
+        data = request.json
+        username = data.get('username')
+        email = data.get('email')
+        if username and email:
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user:
+                return jsonify({'error': 'User with this email already exists'}), 400
+            new_user = User(username=username, email=email)
+            db.session.add(new_user)
+            db.session.commit()
+            return jsonify({'message': 'User added successfully'}), 201
+        else:
+            return jsonify({'error': 'Missing username or email'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/users')
 def get_users():
@@ -83,21 +98,99 @@ labels = [0, 0, 1, 0, 1]
 text_data = [email["subject"] + " " + email["content"] for email in emails]
 pipeline.fit(text_data, labels)
 
-# Route to handle email classification requests
-@app.route('/api/email/classify', methods=['POST'])
+@app.route('/add_email', methods=['GET', 'POST'])
+def add_email():
+    if request.method == 'POST':
+        sender = request.form['sender']
+        subject = request.form['subject']
+        content = request.form['content']
+
+        # Create a new Email instance and add it to the database
+        new_email = Email(
+            sender=sender,
+            subject=subject,
+            content=content
+        )
+        db.session.add(new_email)
+        db.session.commit()
+
+        return redirect(url_for('index'))  # Redirect to the homepage after adding email
+    return render_template('add_email.html')
+
+email_filters = []
+"""
+add_email_filter(): 
+
+"""
+
+@app.route('/api/email/filter', methods=['POST'])
+def add_email_filter():
+    
+    if request.method == 'POST':
+        data = request.json
+        email = data.get('email')
+        if not email or not isinstance(email, str) or '@' not in email:
+            return jsonify({'error': 'Invalid email address'}), 400
+        email_filters.append(email)
+        return jsonify({'message': 'Email filter added successfully.'}), 200
+    else:
+        return jsonify({'error': 'Method not allowed'}), 405
+
+@app.route('/filter_email', methods=['GET', 'POST'])
+def filter_email():
+    if request.method == 'POST':
+        email_id = request.form['email_id']
+        classification = request.form['classification']
+
+        # Update the classification in the database for the selected email
+        email = Email.query.get(email_id)
+        if email:
+            email.classification = classification
+            db.session.commit()
+            return jsonify({'message': 'Email classified successfully'})
+
+        return jsonify({'error': 'Email not found'}), 404
+
+    # Fetch emails from the database
+    emails = Email.query.all()
+
+    return render_template('mail_filtering.html', emails=emails)
+
+@app.route('/classify_email', methods=['POST'])
 def classify_email():
-    data = request.json
-    email_subject = data.get('subject')
-    email_content = data.get('content')
+    email_id = request.form['email_id']
+    classification = request.form['classification']
 
-    # Combine subject and content into a single text
-    email_text = email_subject + " " + email_content
+    # Update the classification in the database for the selected email
+    email = Email.query.get(email_id)
+    if email:
+        email.classification = classification
+        db.session.commit()
+        flash('Email has been classified successfully', 'success')
+        return redirect(url_for('mail_filtering'))  # Redirect to the mail filtering page after classification
 
-    # Use the trained classifier to classify the email
-    classification = pipeline.predict([email_text])[0]
+    flash('Email not found', 'error')
+    return redirect(url_for('mail_filtering'))
 
-    # Return the classification result as a JSON response
-    return jsonify({'classification': 'spam' if classification == 1 else 'not spam'})
+
+
+
+# Route to handle email classification requests
+# @app.route('/api/email/classify', methods=['POST'])
+# def classify_email():
+#     data = request.json
+#     email_subject = data.get('subject')
+#     email_content = data.get('content')
+
+#     # Combine subject and content into a single text
+#     email_text = email_subject + " " + email_content
+
+#     # Use the trained classifier to classify the email
+#     classification = pipeline.predict([email_text])[0]
+
+#     # Return the classification result as a JSON response
+#     return jsonify({'classification': 'spam' if classification == 1 else 'not spam'})
+
 # Route to add an email address/content to the screening list
 @app.route('/api/screening/add', methods=['POST'])
 def add_to_screening_list():
@@ -156,6 +249,8 @@ def mark_email():
         return jsonify({'message': 'Email marked successfully'}), 200
     else:
         return jsonify({'error': 'Missing email ID or mark type'}), 400
+    
+
 
 # Route to retrieve marked emails
 @app.route('/api/emails/marked')
@@ -195,15 +290,27 @@ def get_emails_in_folder(folder_id):
 # Blacklist management function
 @app.route('/api/blacklist/add', methods=['POST'])
 def add_to_blacklist():
-    # Implement blacklist management logic here
-    # Users can add email addresses or content to the blacklist
     data = request.json
-    entry = data.get('entry')
-    if entry:
-        blacklist.append(entry)
+    blacklist_type = data.get('type')
+    value = data.get('value')
+    if blacklist_type and value:
+        new_blacklist_item = Blacklist(type=blacklist_type, value=value)
+        db.session.add(new_blacklist_item)
+        db.session.commit()
         return jsonify({'message': 'Added to blacklist successfully'}), 200
     else:
-        return jsonify({'error': 'Missing entry'}), 400
+        return jsonify({'error': 'Missing type or value'}), 400
+    
+def is_blacklisted(blacklist_type, value):
+    blacklisted_items = Blacklist.query.filter_by(type=blacklist_type).all()
+    for item in blacklisted_items:
+        if item.value == value:
+            return True
+    return False
+
+def process_email(email):
+    if is_blacklisted('email', email.sender):
+        email.classification = 'spam'
 
 @app.route('/api/blacklist/remove', methods=['POST'])
 def remove_from_blacklist():
