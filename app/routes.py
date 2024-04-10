@@ -32,11 +32,13 @@ def mail_screening():
 
 @app.route('/mail_marking')
 def mail_marking():
-    return render_template('mail_marking.html')
+    emails = Email.query.all()
+    return render_template('mail_marking.html', emails=emails )
 
 @app.route('/mail_archiving')
 def mail_archiving():
-    return render_template('mail_archiving.html')
+    emails = Email.query.all()
+    return render_template('mail_archiving.html', emails=emails)
 
 @app.route('/user_management')
 def user_management():
@@ -175,6 +177,28 @@ def classify_email():
     return redirect(url_for('mail_filtering'))
 
 
+# Endpoint to mark email as important
+@app.route('/api/email/mark_important', methods=['POST'])
+def mark_important():
+    email_ids = request.json.get('emailIds')
+    for email_id in email_ids:
+        email = Email.query.get(email_id)
+        if email:
+            email.is_important = True
+            db.session.commit()
+    return jsonify({'message': 'Emails marked as important successfully'})
+
+
+# Endpoint to archive email
+@app.route('/api/email/archive', methods=['POST'])
+def archive_emails():
+    email_ids = request.json.get('emailIds')
+    for email_id in email_ids:
+        email = Email.query.get(email_id)
+        if email:
+            email.is_archived = True
+            db.session.commit()
+    return jsonify({'message': 'Emails archived successfully'})
 
 
 # Route to handle email classification requests

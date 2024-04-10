@@ -1,0 +1,3 @@
+#!/bin/bash
+python app/app.py db migrate -m "Added is_important column to Email model"
+python app/app.py db upgrade
