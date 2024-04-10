@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mail Screening</title>
+
     <style>
         body {
-            background-image: url('../static/SCstfhBx.jpeg'); /* Set background image */
+            background-image: url('../static/SCstfhBx.jpeg') !important; /* Set background image */
             background-size: cover;
             margin: 0; /* Remove default margin */
             font-family: 'Roboto', sans-serif; /* Set font style */
@@ -50,40 +45,62 @@
             background-color: #0056b3; /* Darker background color on hover */
         }
     </style>
-</head>
-<body>
+{% extends 'base.html' %}
+    {% block title %}Spam Classification System{% endblock %}
+    {% block content %}
     <h1>Mail Screening</h1>
-    <form id="screeningForm">
+    <form id="screeningForm" ">
         <label for="blacklist">Blacklist Email Address:</label>
         <input type="email" id="blacklist" name="blacklist">
         <button type="submit">Add to Blacklist</button>
+        <a href="blacklist">List</a>
     </form>
 
-    <script>
-        document.getElementById('screeningForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            var email = document.getElementById('blacklist').value;
-            // AJAX request to backend service to add email to blacklist
-            fetch('/api/blacklist/add', {  // Corrected the endpoint URL
-                method: 'POST',
-                body: JSON.stringify({ entry: email }),  // Corrected the JSON key
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                // Handle response
-                if (response.ok) {
-                    // Optionally, show a success message or perform any other action
-                    console.log('Email added to blacklist successfully.');
-                } else {
-                    console.error('Failed to add email to blacklist:', response.statusText);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+    <div id="messageContainer" style="color: red; font-sixe: 20px"></div>
+
+<script>
+    document.getElementById('screeningForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form submission
+
+        var email = document.getElementById('blacklist').value;
+
+        // AJAX request to backend service to add email to blacklist
+        fetch('/api/blacklist/add', {
+            method: 'POST',
+            body: JSON.stringify({ email: email }), // Send email value in JSON format
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            // Handle response
+            if (response.ok) {
+                // Show success message
+                showMessage('Email added to blacklist successfully.');
+            } else {
+                console.error('Failed to add email to blacklist:', response.statusText);
+                showMessage('Email already added.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
-    </script>
+    });
+
+    function showMessage(message) {
+        var messageContainer = document.getElementById('messageContainer');
+        var messageElement = document.createElement('div');
+        messageElement.textContent = message;
+        messageContainer.appendChild(messageElement);
+
+        // Fade out after 1 second
+        setTimeout(function() {
+            messageElement.style.transition = 'opacity 0.5s ease';
+            messageElement.style.opacity = '0';
+        }, 1000);
+    }
+</script>
+    
+    {% endblock %}
 </body>
 </html>

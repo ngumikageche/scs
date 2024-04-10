@@ -1,4 +1,3 @@
-
 from app import db
 from datetime import datetime
  # Import the db instance
@@ -12,11 +11,13 @@ class User(db.Model):
         return f"User('{self.username}', '{self.email}')"
 
 class Email(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sender = db.Column(db.String(120), nullable=False)
     subject = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
     classification = db.Column(db.String(20), nullable=True)  # New column for classification status
+    is_important = db.Column(db.Boolean, default=False)  # Check if this column is defined correctly
+    is_archived = db.Column(db.Boolean, default=False)
     folder_id = db.Column(db.Integer, db.ForeignKey('folder.id'), nullable=True)
     folder = db.relationship('Folder', backref=db.backref('emails', lazy=True))
 

@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mail Marking</title>
+
     <style>
         body {
-            background-image: url('../static/VnuFwJGp.jpeg'); /* Set background image */
+            background-image: url('../static/VnuFwJGp.jpeg') !important; /* Set background image */
             background-size: cover;
             margin: 0; /* Remove default margin */
             font-family: 'Roboto', sans-serif; /* Set font style */
@@ -45,24 +40,110 @@
         button[type="submit"]:hover {
             background-color: #0056b3; /* Darker background color on hover */
         }
+        
     </style>
-</head>
-<body>
+    {% extends 'base.html' %}
+    {% block title %}Mail Marking{% endblock %}
+    {% block content %}
     <h1>Mail Marking</h1>
+    <style>
+        .emails{
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: space-around;
+             margin-top: 20px;
+ 
+        }
+    </style>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .marked {
+            background-color: #ffdddd; /* Example of visual distinction */
+        }
+    </style>
     <form id="markingForm">
-        <label for="important">Mark as Important:</label>
-        <input type="checkbox" id="important" name="important">
-        <button type="submit">Mark</button>
+        <table class="glass-pan-m">
+            <thead>
+                <tr>
+                    <th>ID</th> <!-- Empty cell for checkbox -->
+                    <th>Subject</th>
+                    <th>From</th>
+                    <th>Body</th>
+                    <th>classification</th>
+                    <th>Mark as Important</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for email in emails %}
+                <tr id="email_{{ email.id }}">
+                    <td>{{ email.id }}</td>
+                    <td>{{ email.subject }}</td>
+                    <td>{{ email.sender }}</td>
+                    <td>{{ email.content }}</td>
+                    <td>{{ email.classification }}</td>
+                    <td>
+                        <!-- Hidden input for email ID -->
+                        <input type="hidden" name="emailId" value="{{ email.id }}">
+                        <!-- Checkbox for marking as important -->
+                        <input type="checkbox" name="importantEmail" value="{{ email.id }}">
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+        <input type="hidden" name="importantEmailIds" id="importantEmailIds">
+        <button type="submit">Mark Selected as Important</button>
     </form>
 
+    <button type="submit">Archive Selected</button>
+    
+<table class="glass-pan-m">
+    <h1>Important Emails</h1>
+    <thead>
+        <tr>
+            <th>Sender</th>
+            <th>Subject</th>
+            <th>Content</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for email in emails %}
+            {% if email.is_important == True %}
+            <tr>
+                <td>{{ email.sender }}</td>
+                <td>{{ email.subject }}</td>
+                <td>{{ email.content }}</td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
     <script>
         document.getElementById('markingForm').addEventListener('submit', function(event) {
             event.preventDefault();
-            var isImportant = document.getElementById('important').checked;
-            // AJAX request to backend service to mark email as important
-            fetch('/api/email/mark', {  // Adjust the endpoint URL
+            var checkedEmails = document.querySelectorAll('input[name="importantEmail"]:checked');
+            var emailIds = [];
+            checkedEmails.forEach(function(email) {
+                emailIds.push(email.value);
+            });
+        
+            // AJAX request to mark selected emails as important
+            fetch('/api/email/mark_important', {
                 method: 'POST',
-                body: JSON.stringify({ isImportant: isImportant }),
+                body: JSON.stringify({ emailIds: emailIds }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -71,15 +152,47 @@
                 // Handle response
                 if (response.ok) {
                     // Optionally, show a success message or perform any other action
-                    console.log('Email marked successfully.');
+                    console.log('Emails marked as important successfully.');
                 } else {
-                    console.error('Failed to mark email:', response.statusText);
+                    console.error('Failed to mark emails as important:', response.statusText);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         });
+        
+        
+        
+        document.getElementById('archivingForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var checkedEmails = document.querySelectorAll('input[name="archiveEmail"]:checked');
+            var emailIds = [];
+            checkedEmails.forEach(function(email) {
+                emailIds.push(email.value);
+            });
+        
+            // AJAX request to archive selected emails
+            fetch('/api/email/archive', {
+                method: 'POST',
+                body: JSON.stringify({ emailIds: emailIds }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                // Handle response
+                if (response.ok) {
+                    // Optionally, show a success message or perform any other action
+                    console.log('Emails archived successfully.');
+                } else {
+                    console.error('Failed to archive emails:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+        
     </script>
-</body>
-</html>
+    {% endblock %}

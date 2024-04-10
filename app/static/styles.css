@@ -34,7 +34,7 @@ body {
     place-items: center; /* Center the text vertically and horizontally */
     position: absolute; /* Position absolutely */
     top: 320px; /* Align the pane to the top */
-    left: 0; /* Align the pane to the left */
+    /* left: 0; Align the pane to the left */
     width: 100vw; /* Full viewport width */
     height: auto; /* Adjust height based on content */
     padding: 20px; /* Add padding for spacing around content */
@@ -60,3 +60,12 @@ body-mail-archiving {
     background-image: url('c2_wK2A1.jpeg'); /* Replace 'mail-archiving-background.jpg' with the path to your image */
     background-size: cover;
 }
+.glass-pan-m {
+    /* Add padding for spacing around content */
+     background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white background */
+     backdrop-filter: blur(3px); /* Apply blur effect to the background */
+     z-index: 1; /* Ensure the glass pane is above other elements */
+     border-radius: 10px; /* Add rounded corners */
+     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow */
+     text-align: center; /* Center text */
+ }
