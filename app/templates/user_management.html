@@ -114,6 +114,8 @@
     <input type="text" id="username" name="username">
     <label for="email">Email:</label>
     <input type="email" id="email" name="email">
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password">
     <button type="submit">Add User</button>
 </form>
 
@@ -143,36 +145,42 @@
             });
     }
 
-    // Event listener for adding a new user
     document.getElementById('addUserForm').addEventListener('submit', function (event) {
         event.preventDefault();
+    
         const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
-
+        const password = document.getElementById('password').value; // Include password
+    
         fetch('/api/user/add', {
             method: 'POST',
-            body: JSON.stringify({ username: username, email: email }),
+            body: JSON.stringify({ username: username, email: email, password: password }), // Include password
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-            .then(response => {
-                if (response.ok) {
-                    fetchUserList(); // Refresh user list after adding user
-                    // Clear input fields
-                    document.getElementById('username').value = '';
-                    document.getElementById('email').value = '';
-                } else {
-                    console.error('Error:', response.statusText);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        .then(response => {
+            if (response.ok) {
+                return response.json(); // Parse response JSON data
+            } else {
+                throw new Error('Failed to add user');
+            }
+        })
+        .then(data => {
+            fetchUserList(); // Refresh user list after adding user
+            // Clear input fields
+            document.getElementById('username').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = ''; // Clear password field
+        })
+        .catch(error => {
+            console.error('Error:', error.message); // Log error message
+        });
     });
-
+    
     // Fetch user list when the page loads
     fetchUserList();
+    
 </script>
 
 {% endblock %}

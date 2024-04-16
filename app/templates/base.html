@@ -15,9 +15,18 @@
         <div class="template-box" onclick="navigateTo('/mail_archiving')">Mail Archiving</div>
         <div class="template-box" onclick="navigateTo('/user_management')">User Management</div>
     </header>
-
+    {% if session.username %}
+        <!-- <h1>Welcome, {{ session.username }}!</h1> -->
+        <form action="{{ url_for('logout') }}" method="post">
+            <button type="submit">Logout</button>
+        </form>
+    {% else %}
+        <h1>Welcome!</h1>
+    {% endif %}
+</body>
     <!-- Glass pane for text description -->
-    {% block content %}{% endblock %}
+    {% block content %}
+    {% endblock %}
 
     <!-- JavaScript to handle navigation -->
     <script>

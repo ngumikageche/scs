@@ -21,14 +21,17 @@ class TestModels(unittest.TestCase):
         self.app_context.pop()
 
     def test_user_creation(self):
-        # Test creating a user
-        user = User(username='testuser', email='test@example.com')
+    # Test creating a user
+        user = User(username='admin', email='admin@gmail.com')
+        user.set_password('pass')  # Set a password for the user
         db.session.add(user)
         db.session.commit()
 
         self.assertEqual(User.query.count(), 1)
         self.assertEqual(User.query.first().username, 'testuser')
         self.assertEqual(User.query.first().email, 'test@example.com')
+        self.assertTrue(User.query.first().check_password('password123'))  # Check if password is correctly hashed
+
 
     def test_email_creation(self):
         # Test creating an email

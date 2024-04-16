@@ -1,4 +1,4 @@
-from flask import render_template, jsonify, request, redirect, url_for, flash
+from flask import render_template, jsonify, request, redirect, url_for, flash, session
 from app import app, db
 from app.models import User
 from app.models import Folder
@@ -7,6 +7,20 @@ from app.models import Blacklist
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired
+from flask_login import login_user, LoginManager, login_required, logout_user
+from werkzeug.security import generate_password_hash
+
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    # This function is used by Flask-Login to load a user from the user ID stored in the session
+    return User.query.get(int(user_id))
+
 
 # Placeholder data (replace with actual backend logic)
 mails = []
@@ -18,59 +32,102 @@ screening_list = []
 # Render templates...
 @app.route('/')
 @app.route('/index')
+@login_required
 def index():
     return render_template('index.html')
 
 @app.route('/mail_filtering')
+@login_required
 def mail_filtering():
     emails = Email.query.all()
     return render_template('mail_filtering.html', emails=emails)
 
 @app.route('/mail_screening')
+@login_required
 def mail_screening():
     return render_template('mail_screening.html')
 
 @app.route('/mail_marking')
+@login_required
 def mail_marking():
     emails = Email.query.all()
     return render_template('mail_marking.html', emails=emails )
 
 @app.route('/mail_archiving')
+@login_required
 def mail_archiving():
     emails = Email.query.all()
     return render_template('mail_archiving.html', emails=emails)
 
 @app.route('/user_management')
+@login_required
 def user_management():
     return render_template('user_management.html')
 
 @app.route('/emails')
+@login_required
 def show_emails():
     emails = Email.query.all()  # Retrieve all emails from the database
     return render_template('emails.html', emails=emails)
 
 @app.route('/blacklist')
+@login_required
 def view_blacklist():
     blacklisted_items = Blacklist.query.all()
     return render_template('blacklist.html', blacklisted_items=blacklisted_items)
 
+
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
+
 # Backend API endpoints
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            flash('Logged in successfully.', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid email or password.', 'danger')
+    return render_template('login.html', form=form)
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    # Clear the session data, including the username
+    session.clear()
+    # Optionally, you can also logout the user using Flask-Login
+    logout_user()
+    return redirect(url_for('index'))
+
 @app.route('/api/user/add', methods=['POST'])
 def add_user():
     try:
         data = request.json
         username = data.get('username')
         email = data.get('email')
-        if username and email:
+        password = data.get('password')  # Get the password from the request data
+
+        if username and email and password:
             existing_user = User.query.filter_by(email=email).first()
             if existing_user:
                 return jsonify({'error': 'User with this email already exists'}), 400
-            new_user = User(username=username, email=email)
+            
+            # Hash the password before storing it
+            password_hash = generate_password_hash(password)
+
+            new_user = User(username=username, email=email, password_hash=password_hash)
             db.session.add(new_user)
             db.session.commit()
             return jsonify({'message': 'User added successfully'}), 201
         else:
-            return jsonify({'error': 'Missing username or email'}), 400
+            return jsonify({'error': 'Missing username, email, or password'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
